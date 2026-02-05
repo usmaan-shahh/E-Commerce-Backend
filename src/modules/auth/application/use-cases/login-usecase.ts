@@ -22,7 +22,8 @@ export class LoginUseCase {
     if (!isMatch) throw new UnauthorizedException('Invalid Credentials');
 
     const accessToken = this.TokenServiceInterface.issueAccessToken({sub: user.id});
-    const refreshToken = this.TokenServiceInterface.issueAccessToken({sub: user.id});
+
+    const refreshToken = this.TokenServiceInterface.issueRefreshToken({sub: user.id});
 
     return {accessToken, refreshToken}
    
