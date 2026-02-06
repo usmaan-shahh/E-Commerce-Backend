@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Order } from '../domain/aggregate-root';
-import { IOrderRepository } from '../domain/order.repository.interface';
+import { Order } from '../domain/aggregate/root';
+import { IOrderRepository } from '../domain/interface/order-interface';
 import { OrderEntity } from './order.entity';
 import { OrderMapper } from './order.mapper';
 

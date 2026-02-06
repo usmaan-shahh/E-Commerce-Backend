@@ -1,8 +1,9 @@
 import { Entity, Column, PrimaryColumn } from 'typeorm';
-import type { OrderStatus } from '../domain/aggregate-root';
+import type { OrderStatus } from '../domain/aggregate/root';
 
 @Entity('orders')
 export class OrderEntity {
+
     @PrimaryColumn()
     id: string;
 
@@ -15,14 +16,19 @@ export class OrderEntity {
     @Column('decimal', { precision: 10, scale: 2 })
     total: number;
 
-    @Column({
-        type: 'enum',
-        enum: ['CREATED', 'PAID', 'CANCELLED'],
-        default: 'CREATED',
-    })
+    @Column(
+        {
+            type: 'enum',
+            enum: ['CREATED', 'PAID', 'CANCELLED'],
+            default: 'CREATED',
+        })
     status: OrderStatus;
 
-    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    @Column(
+        {
+            type: 'timestamp', default: () => 'CURRENT_TIMESTAMP'
+
+        })
     createdAt: Date;
 
     @Column({

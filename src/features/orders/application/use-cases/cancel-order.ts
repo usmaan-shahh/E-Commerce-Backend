@@ -1,11 +1,13 @@
+import { Injectable } from "@nestjs/common";
+import { OrderRepository } from "../../infrastructure";
 
 @Injectable()
 export class CancelOrderUseCase {
-  constructor(private readonly orderRepo: OrderRepository) {}
+  constructor(private readonly orderRepository: OrderRepository) {}
 
   async execute(orderId: string) {
     const row = await this.orderRepo.findById(orderId);
-    if (!row) throw new NotFoundException("Order not found");
+    if (!row) throw new NotFoundException('Order not found');
 
     const order = Order.fromPrimitives(row);
 
@@ -17,6 +19,6 @@ export class CancelOrderUseCase {
 
     await this.orderRepo.save(order.toPrimitives());
 
-    return { status: "CANCELLED" };
+    return { status: 'CANCELLED' };
   }
 }

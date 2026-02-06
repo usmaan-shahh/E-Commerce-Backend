@@ -19,3 +19,5 @@ export class Quantity {
 
 
 // This Guarantees Every Quantity in your system is valid.
+/* If Frontend sends { "productId": "p123", "qty": -5 },  Quantity.validate(-5) Will Throw an Error */
+// Quantity Guarantees Every Quantity in your system is valid.

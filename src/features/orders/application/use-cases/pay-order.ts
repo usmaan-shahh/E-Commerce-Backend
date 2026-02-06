@@ -1,13 +1,13 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
-import { Order } from "../../domain/aggregate-root";
+import { Order } from "../../domain/aggregate/root";
 
 @Injectable()
 export class PayOrderUseCase {
 
-  constructor() {}
+  constructor() { }
 
   async execute(orderId: string) {
-    
+
     const row = await this.orderRepo.findById(orderId);
     if (!row) throw new NotFoundException('Order not found');
 
@@ -15,7 +15,7 @@ export class PayOrderUseCase {
     const order = Order.fromPrimitives(row);
 
     try {
-      order.markPaid(); 
+      order.markPaid();
     } catch (error) {
       throw new BadRequestException(error.message);
     }

@@ -1,24 +1,49 @@
 import { Money } from "../value-objects/money-vo";
 import { OrderId } from "../value-objects/orderId-vo";
 import { Quantity } from "../value-objects/quatity-vo";
+import { OrderCreatedEvent } from "../events/order-created.event";
+
 
 export type OrderStatus = "CREATED" | "PAID" | "CANCELLED";
 
 export class Order {
   private status: OrderStatus = 'CREATED';
+  private domainEvents: any[] = [];
 
   private constructor(
     private readonly id: OrderId,
     private readonly productId: string,
     private readonly quantity: Quantity,
     private total: Money,
-  ) {}
+  ) { }
+
+  private recordEvent(event: any) {
+    this.domainEvents.push(event);
+  }
+
+  pullDomainEvents() {
+    const events = [...this.domainEvents];
+    this.domainEvents = [];
+    return events;
+  }
 
   /* To create an Order, you must give me a productId, quantity, and unit price.
 I  will calculate the total safely and generate an OrderId for you */
   static create(productId: string, quantity: Quantity, price: Money) {
     const total = Money.validate(price.getValue() * quantity.getValue());
-    return new Order(OrderId.create(), productId, quantity, total);
+    const order = new Order(OrderId.create(), productId, quantity, total);
+
+    // Record domain event
+    order.recordEvent(
+      new OrderCreatedEvent(
+        order.id.getValue(),
+        order.productId,
+        order.quantity.getValue(),
+        order.total.getValue(),
+      )
+    );
+
+    return order;
   }
 
   markPaid() {
