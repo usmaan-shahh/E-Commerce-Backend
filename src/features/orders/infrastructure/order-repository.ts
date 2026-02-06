@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Order } from '../domain/aggregate/root';
 import { IOrderRepository } from '../domain/interface/order-interface';
-import { OrderEntity } from './order.entity';
-import { OrderMapper } from './order.mapper';
+import { OrderEntity } from './order-entity';
+import { OrderMapper } from './order-mapper';
 
 @Injectable()
 export class OrderRepository implements IOrderRepository {

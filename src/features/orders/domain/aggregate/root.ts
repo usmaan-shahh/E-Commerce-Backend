@@ -1,7 +1,10 @@
 import { Money } from "../value-objects/money-vo";
 import { OrderId } from "../value-objects/orderId-vo";
-import { Quantity } from "../value-objects/quatity-vo";
+import { Quantity } from "../value-objects/quantity-vo";
 import { OrderCreatedEvent } from "../events/order-created.event";
+import { OrderPaidEvent } from "../events/order-paid.event";
+import { OrderCancelledEvent } from "../events/order-cancelled.event";
+
 
 
 export type OrderStatus = "CREATED" | "PAID" | "CANCELLED";
@@ -33,6 +36,7 @@ I  will calculate the total safely and generate an OrderId for you */
     const total = Money.validate(price.getValue() * quantity.getValue());
     const order = new Order(OrderId.create(), productId, quantity, total);
 
+
     // Record domain event
     order.recordEvent(
       new OrderCreatedEvent(
@@ -51,6 +55,7 @@ I  will calculate the total safely and generate an OrderId for you */
       throw new Error('Only created orders can be paid');
     }
     this.status = 'PAID';
+    this.recordEvent(new OrderPaidEvent(this.id.getValue()));
   }
 
   cancel() {
@@ -58,6 +63,7 @@ I  will calculate the total safely and generate an OrderId for you */
       throw new Error('Paid orders cannot be cancelled');
     }
     this.status = 'CANCELLED';
+    this.recordEvent(new OrderCancelledEvent(this.id.getValue()));
   }
 
   toPrimitives() {

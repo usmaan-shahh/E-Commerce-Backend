@@ -1,9 +1,12 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { Order } from "../../domain/aggregate/root";
-import { Money } from "../../domain/value-objects/money-vo";
-import { Quantity } from "../../domain/value-objects/quatity-vo";
-import type { IOrderRepository } from "../../domain/interface/order-interface"
-
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { Order } from '../../domain/aggregate/root';
+import { Money } from '../../domain/value-objects/money-vo';
+import { Quantity } from '../../domain/value-objects/quantity-vo';
+import type { IOrderRepository } from '../../domain/interface/order-interface';
+import { OrderEvents } from '../../domain/events/order.events';
+import { OrderCreatedEvent } from '../../domain/events/order-created.event';
+//TODO: Impot products when it is implemented
 
 @Injectable()
 export class PlaceOrderUseCase {
@@ -11,26 +14,36 @@ export class PlaceOrderUseCase {
   constructor(
     @Inject('IOrderRepository')
     private readonly OrderRepositoryInterface: IOrderRepository,
-  ) {}
+    // TODO: Inject Product Interface  when products feature is implemented
+    private readonly eventEmitter: EventEmitter2,
+
+  ) { }
 
   async execute(input: { productId: string; qty: number }) {
-    const product = await this.productRepo.findById(input.productId);
-    if (!product) throw new NotFoundException('Product not found');
+
+    // TODO: Validate product exists and get price from server when products feature is implemented
 
     const quantity = Quantity.validate(input.qty);
-    const price = Money.validate(product.price);
+    // TODO: Check Product Stock from server when products feature is implemented
 
-    if (product.stock < quantity.getValue()) {
-      throw new BadRequestException('Out of stock');
-    }
 
+    // TODO: Get actual price from product repository
+    const price = Money.validate(100); // Temporary hardcoded price
     const order = Order.create(input.productId, quantity, price);
 
-    product.stock -= quantity.getValue();
-
-    await this.productRepo.save(product);
+    // TODO: update stock and save
     await this.OrderRepositoryInterface.save(order);
 
+    // Publish domain events from application layer
+    for (const event of order.pullDomainEvents()) {
+
+      if (event instanceof OrderCreatedEvent) {
+        this.eventEmitter.emit(OrderEvents.OrderCreated, event);
+      }
+
+    }
+
     return { orderId: order.toPrimitives().id };
+
   }
 }
